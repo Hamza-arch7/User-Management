@@ -1,0 +1,239 @@
+package components
+
+import "strings"
+
+templ BaseLayout(content templ.Component) {
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <link rel="icon" href="/static/favicon.ico">
+        <title>Lock Down Security User Management</title>
+        <link rel="stylesheet" href="/static/styles.css">
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+        <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    </head>
+    <body>
+    <div class="logo-container">
+    <img src="/static/logo.png" alt="Company Logo" class="logo">
+</div>
+        <div class="container">
+            <h1>Lock Down Security <br> User Management</h1>
+            <div id="main-content">
+                @ProfileForm("")
+                <div id="user-list">
+                    @content
+                </div>
+            </div>
+        </div>
+        <script>
+            document.body.addEventListener('htmx:afterRequest', function(event) {
+                if (event.detail.xhr.getResponseHeader('HX-Trigger')?.includes('resetForm')) {
+                    const form = document.getElementById('profile-form');
+                    if (form) form.reset();
+                    const availabilityElement = document.getElementById('username-availability');
+                    if (availabilityElement) {
+                        availabilityElement.innerHTML = '';
+                        availabilityElement.className = 'availability';
+                    }
+                }
+            });
+        </script>
+    </body>
+    </html>
+}
+
+templ UserList(users []User) {
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @htmxIndicator()
+            for _, user := range users {
+                <tr>
+                    <td>{ user.Username }</td>
+                    <td>{ user.Email }</td>
+                    <td>{ user.Type }</td>
+                    <td>{ user.CreatedAt.Format("2006-01-02 15:04") }</td>
+                    <td>
+                        <button
+                            class="btn btn-danger"
+                            _="on click
+                                add .confirming to me
+                                if confirm('Are you sure you want to delete this user?')
+                                    trigger deleteConfirmed
+                                else
+                                    remove .confirming from me
+                                end"
+                            hx-delete={ "/users/" + user.ID }
+                            hx-target="#main-content"
+                            hx-swap="innerHTML"
+                            hx-trigger="deleteConfirmed"
+                            hx-indicator="#htmx-indicator"
+                        >
+                            Delete
+                        </button>
+                        <button
+                            class="btn btn-primary"
+                            hx-get={"/users/" + user.ID + "/edit"}
+                            hx-target="#main-content"
+                            hx-swap="innerHTML"
+                        >
+                            Edit
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+templ htmxIndicator() {
+    <span class="htmx-indicator">Loading...</span>
+}
+
+templ ProfileForm(errorMsg string) {
+    if errorMsg != "" {
+        <div id="error-message" style="color: red;">{ errorMsg }</div>
+    }
+    <form id="profile-form" hx-post="/users" hx-target="#main-content" hx-swap="innerHTML">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input
+                class="form-control"
+                type="text"
+                name="username"
+                id="username"
+                required
+                hx-post="/check-username"
+                hx-trigger="keyup changed delay:500ms"
+                hx-target="#username-availability"
+                hx-swap="innerHTML"
+                hx-indicator="#checking"
+            />
+            <span id="username-availability" class={ indicator(false) }></span>
+            <span id="checking" class="htmx-indicator">Checking...</span>
+        </div>
+        @ProfileFormFields("regular")
+        <button type="submit" class="btn btn-primary" hx-disable>Add User</button>
+        <span class="htmx-indicator">Saving...</span>
+    </form>
+}
+
+templ EditForm(user User) {
+    <form hx-put={"/users/" + user.ID} hx-target="#main-content" hx-swap="innerHTML">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input
+                class="form-control"
+                type="text"
+                name="username"
+                id="username"
+                value={ user.Username }
+                required
+                hx-post="/check-username"
+                hx-trigger="keyup changed delay:500ms"
+                hx-target="#username-availability"
+                hx-swap="innerHTML"
+                hx-indicator="#checking"
+            />
+            <span id="username-availability" class={ indicator(false) }></span>
+            <span id="checking" class="htmx-indicator">Checking...</span>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input
+                class="form-control"
+                type="email"
+                name="email"
+                id="email"
+                value={ user.Email }
+                required
+            />
+        </div>
+        <div class="form-group">
+            <label>Type</label>
+            <span>{ user.Type }</span>
+        </div>
+        <div class="form-group">
+            <label>Created At</label>
+            <span>{ user.CreatedAt.Format("2006-01-02 15:04") }</span>
+        </div>
+        <button type="submit" class="btn btn-primary" hx-disable>Save</button>
+        <span class="htmx-indicator">Saving...</span>
+    </form>
+}
+
+func indicator(available bool) string {
+    classes := []string{"availability"}
+    if available {
+        classes = append(classes, "valid-indicator")
+    } else {
+        classes = append(classes, "invalid-indicator")
+    }
+    return strings.Join(classes, " ")
+}
+
+templ UsernameAvailability(available bool) {
+    <span class={ indicator(available) }>
+        if available {
+            Available
+        } else {
+            Taken
+        }
+    </span>
+}
+
+templ ProfileFormFields(userType string) {
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input
+            class="form-control"
+            type="email"
+            name="email"
+            id="email"
+            required
+        />
+    </div>
+    <div class="form-group">
+        <label for="user_type">User Type</label>
+        <select
+            class="form-control"
+            name="user_type"
+            id="user_type"
+            hx-get="/user-type-fields"
+            hx-target="#extra-fields"
+            hx-swap="innerHTML"
+            hx-trigger="change"
+        >
+            <option value="regular" selected>Regular</option>
+            <option value="admin">Admin</option>
+        </select>
+    </div>
+    <div id="extra-fields">
+        @ExtraFields(userType)
+    </div>
+}
+
+templ ExtraFields(userType string) {
+    if userType == "admin" {
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="console_access">
+                Console Access
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="logs_access">
+                Logs Access
+            </label>
+        </div>
+    }
+}
