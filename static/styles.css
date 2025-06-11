@@ -1,0 +1,256 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #1a1b26;
+    color: #e0e0e0;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(90deg, #2a2b38 0%, #3b3c4e 100%);
+    color: #ffffff;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-container {
+    position: absolute;
+    top: 20px;      /* More breathing room */
+    left: 30px;     /* Keep it from hugging the corner */
+    z-index: 1000;
+}
+
+.logo {
+    width: 120px;         /* Bigger size */
+    height: 120px;
+    border-radius: 80%;  /* Round shape */
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);  /* Optional subtle glow */
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05); /* Slight hover effect */
+}
+
+
+.header h1 {
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Container */
+.container {
+    max-width: 1280px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #24283b;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-control {
+    padding: 14px;
+    border: 1px solid #45475a;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    font-size: 15px;
+    background: #2a2b38;
+    color: #e0e0e0;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+    border-color: #7aa2f7;
+    box-shadow: 0 0 8px rgba(122, 162, 247, 0.4);
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: #6b7280;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.btn-primary {
+    background: #7aa2f7;
+    color: #1a1b26;
+}
+
+.btn-primary:hover {
+    background: #5b8bf5;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(122, 162, 247, 0.5);
+}
+
+.btn-danger {
+    background: #f7768e;
+    color: #1a1b26;
+}
+
+.btn-danger:hover {
+    background: #f55774;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(245, 87, 116, 0.5);
+}
+
+/* Table Styles */
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 30px;
+    background: #2a2b38;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid #45475a;
+}
+
+.table th {
+    background: #3b3c4e;
+    font-weight: 600;
+    color: #ffffff;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    color: #c0c0c0;
+    font-size: 14px;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover {
+    background: #34364a;
+}
+
+/* Actions */
+.actions .btn {
+    padding: 10px 20px;
+    margin-right: 12px;
+    font-size: 14px;
+}
+
+/* Indicators */
+.availability {
+    margin-left: 15px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.valid-indicator {
+    color: #9ece6a;
+}
+
+.invalid-indicator {
+    color: #f7768e;
+}
+
+.htmx-indicator {
+    display: none;
+    color: #7aa2f7;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.htmx-request .htmx-indicator {
+    display: inline;
+}
+
+/* Error Message */
+#error-message {
+    color: #f7768e;
+    font-size: 14px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(247, 118, 142, 0.1);
+    border-radius: 6px;
+}
+
+/* Hidden Class */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .header {
+        padding: 15px 20px;
+    }
+
+    .header h1 {
+        font-size: 24px;
+    }
+
+    .logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .form-control {
+        max-width: 100%;
+    }
+
+    .table th, .table td {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .actions .btn {
+        padding: 8px 15px;
+        margin-right: 8px;
+    }
+}
